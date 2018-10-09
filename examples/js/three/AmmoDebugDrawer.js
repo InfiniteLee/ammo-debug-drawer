@@ -8,32 +8,16 @@
  * @param {object} [options]
  */
 THREE.AmmoDebugDrawer = function(scene, world, options){
-  this.scene = scene;
-  this.world = world;
   options = options || {};
 
-  this.debugDrawMode = options.debugDrawMode || 1;
-  var drawOnTop = options.drawOnTop || false;
-  var maxBufferSize = options.maxBufferSize || 1000000;
-
-  this.geometry = new THREE.BufferGeometry();
-  var vertices = new Float32Array(maxBufferSize * 3);
-  var colors = new Float32Array(maxBufferSize * 3);
-
-  this.geometry.addAttribute("position", new THREE.BufferAttribute(vertices, 3).setDynamic(true));
-  this.geometry.addAttribute("color", new THREE.BufferAttribute(colors, 3).setDynamic(true));
-
-  this.index = 0;
-
-  var material = new THREE.LineBasicMaterial({
-    vertexColors: THREE.VertexColors,
-    depthTest: !drawOnTop
-  });
-
-  this.mesh = new THREE.LineSegments(this.geometry, material);
-  if (drawOnTop) this.mesh.renderOrder = 999;
+  this.debugObject = new THREE.Object3D();
+  this.scene = scene;
+  this.world = world;
 
   this.enabled = false;
+
+  this.lineCache = {};
+  this.colors = [];
 
   this.debugDrawer = new Ammo.DebugDrawer();
   this.debugDrawer.drawLine = this.drawLine.bind(this);
@@ -46,6 +30,11 @@ THREE.AmmoDebugDrawer = function(scene, world, options){
   this.debugDrawer.disable = this.disable.bind(this);
   this.debugDrawer.update = this.update.bind(this);
 
+  this.debugDrawMode = options.debugDrawMode || 1;
+  this.drawOnTop = options.drawOnTop || false;
+
+  this.clearDebug = false;
+
   this.world.setDebugDrawer(this.debugDrawer);
 };
 
@@ -55,41 +44,60 @@ THREE.AmmoDebugDrawer.prototype = function() {
 
 THREE.AmmoDebugDrawer.prototype.enable = function(){
   this.enabled = true;
-  this.scene.add(this.mesh);
+  this.scene.add(this.debugObject);
 };
 
 THREE.AmmoDebugDrawer.prototype.disable = function() {
   this.enabled = false;
-  this.scene.remove(this.mesh);
+  this.scene.remove(this.debugObject);
 };
 
 THREE.AmmoDebugDrawer.prototype.update = function(){
   if (!this.enabled) {
     return;
   }
-
-  if (this.index != 0) {
-    this.geometry.attributes.position.needsUpdate = true;
-    this.geometry.attributes.color.needsUpdate = true;
-  }
-
-  this.index = 0;
-
   this.world.debugDrawWorld();
-
-  this.geometry.setDrawRange(0, this.index);
+  this.clearDebug = true;
 };
 
 THREE.AmmoDebugDrawer.prototype.drawLine = function(from, to, color) {
-  var colorVector = Ammo.wrapPointer(color, Ammo.btVector3);
+  if (this.clearDebug) {
+    for (var i = 0; i < this.colors.length; i++) {
+      var key = this.colors[i];
+      while(this.lineCache[key].geometry.vertices.length > 0) {
+          this.lineCache[key].geometry.vertices.pop();
+      }
+    }
+    this.clearDebug = false;
+  }
 
+  if (!this.enabled) {
+    return;
+  }
+
+  var colorVector = Ammo.wrapPointer(color, Ammo.btVector3);
+  if (!this.lineCache.hasOwnProperty(color)) {
+    this.colors.push(color);
+    var material = new THREE.LineBasicMaterial({
+    color: new THREE.Color(colorVector.x(), colorVector.y(), colorVector.z()), 
+    depthTest: !this.drawOnTop
+    });
+    var geometry = new THREE.Geometry();
+    this.lineCache[color] = new THREE.LineSegments(geometry, material);
+    if (this.drawOnTop) this.lineCache[color].renderOrder = 1;
+    this.debugObject.add(this.lineCache[color]);
+  }
+
+  //TODO: use an object pool for these THREE.Vector3's
   var fromVector = Ammo.wrapPointer(from, Ammo.btVector3);
-  this.geometry.attributes.position.setXYZ(this.index, fromVector.x(), fromVector.y(), fromVector.z());
-  this.geometry.attributes.color.setXYZ(this.index++, colorVector.x(), colorVector.y(), colorVector.z());
+  var fv = new THREE.Vector3(fromVector.x(), fromVector.y(), fromVector.z());
+  this.lineCache[color].geometry.vertices.push(fv);
 
   var toVector = Ammo.wrapPointer(to, Ammo.btVector3);
-  this.geometry.attributes.position.setXYZ(this.index, toVector.x(), toVector.y(), toVector.z());
-  this.geometry.attributes.color.setXYZ(this.index++, colorVector.x(), colorVector.y(), colorVector.z());
+  var tv = new THREE.Vector3(toVector.x(), toVector.y(), toVector.z());
+  this.lineCache[color].geometry.vertices.push(tv);
+
+  this.lineCache[color].geometry.verticesNeedUpdate = true;
 };
 
 THREE.AmmoDebugDrawer.prototype.drawContactPoint = function(pointOnB, normalOnB, distance, lifeTime, color) {
