@@ -98,12 +98,12 @@ THREE.AmmoDebugDrawer.prototype.drawContactPoint = function(pointOnB, normalOnB,
 };
 
 THREE.AmmoDebugDrawer.prototype.reportErrorWarning = function(warningString) {
-  console.warn(warningString);
+  console.warn(Ammo.Pointer_stringify(warningString));
 };
 
 THREE.AmmoDebugDrawer.prototype.draw3dText = function(location, textString) {
   //TODO
-  console.log("draw3dText", location, textString);
+  console.log("draw3dText", Ammo.wrapPointer(location, Ammo.btVector3), Ammo.Pointer_stringify(textString));
 };
 
 THREE.AmmoDebugDrawer.prototype.setDebugMode = function(debugMode) {
