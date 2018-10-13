@@ -1,0 +1,21 @@
+{
+  "name": "AmmoDebugDrawer",
+  "version": "0.1.0",
+  "description": "An implementation of the btIDebugDraw interface in Ammo.js, for debug rendering of Ammo shapes.",
+  "homepage": "https://github.com/infinitelee/AmmoDebugDrawer",
+  "main": "./AmmoDebugDrawer.js",
+  "author": "Kevin Lee <kevin@infinite-lee.com>",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/infinitelee/AmmoDebugDrawer/issues"
+  },
+  "repository": "infinitelee/AmmoDebugDrawer",
+  "keywords": [
+    "ammo",
+    "ammo.js",
+    "physics",
+    "debug",
+    "three",
+    "three.js"
+  ]
+}

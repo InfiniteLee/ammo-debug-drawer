@@ -7,7 +7,7 @@
  * @param {Ammo.btCollisionWorld} world
  * @param {object} [options]
  */
-THREE.AmmoDebugDrawer = function(scene, world, options){
+THREE.AmmoDebugDrawer = function(scene, world, options) {
   this.scene = scene;
   this.world = world;
   options = options || {};
@@ -53,7 +53,7 @@ THREE.AmmoDebugDrawer.prototype = function() {
   return this.debugDrawer;
 };
 
-THREE.AmmoDebugDrawer.prototype.enable = function(){
+THREE.AmmoDebugDrawer.prototype.enable = function() {
   this.enabled = true;
   this.scene.add(this.mesh);
 };
@@ -63,7 +63,7 @@ THREE.AmmoDebugDrawer.prototype.disable = function() {
   this.scene.remove(this.mesh);
 };
 
-THREE.AmmoDebugDrawer.prototype.update = function(){
+THREE.AmmoDebugDrawer.prototype.update = function() {
   if (!this.enabled) {
     return;
   }
@@ -94,16 +94,21 @@ THREE.AmmoDebugDrawer.prototype.drawLine = function(from, to, color) {
 
 THREE.AmmoDebugDrawer.prototype.drawContactPoint = function(pointOnB, normalOnB, distance, lifeTime, color) {
   //TODO
-  console.log("drawContactPoint")
+  console.warn("TODO: drawContactPoint");
 };
 
 THREE.AmmoDebugDrawer.prototype.reportErrorWarning = function(warningString) {
-  console.warn(Ammo.Pointer_stringify(warningString));
+  if (Ammo.hasOwnProperty("Pointer_stringify")) {
+    console.warn(Ammo.Pointer_stringify(warningString));
+  } else if (!this.warnedOnce) {
+    this.warnedOnce = true;
+    console.warn("Cannot print warningString, please rebuild Ammo.js using 'debug' flag");
+  }
 };
 
 THREE.AmmoDebugDrawer.prototype.draw3dText = function(location, textString) {
   //TODO
-  console.log("draw3dText", Ammo.wrapPointer(location, Ammo.btVector3), Ammo.Pointer_stringify(textString));
+  console.warn("TODO: draw3dText");
 };
 
 THREE.AmmoDebugDrawer.prototype.setDebugMode = function(debugMode) {
