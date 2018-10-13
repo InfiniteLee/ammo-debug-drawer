@@ -1,15 +1,15 @@
 {
-  "name": "AmmoDebugDrawer",
+  "name": "ammo-debug-drawer",
   "version": "0.1.0",
   "description": "An implementation of the btIDebugDraw interface in Ammo.js, for debug rendering of Ammo shapes.",
-  "homepage": "https://github.com/infinitelee/AmmoDebugDrawer",
+  "homepage": "https://github.com/infinitelee/ammo-debug-drawer",
   "main": "./AmmoDebugDrawer.js",
   "author": "Kevin Lee <kevin@infinite-lee.com>",
   "license": "MPL-2.0",
   "bugs": {
-    "url": "https://github.com/infinitelee/AmmoDebugDrawer/issues"
+    "url": "https://github.com/infinitelee/ammo-debug-drawer/issues"
   },
-  "repository": "infinitelee/AmmoDebugDrawer",
+  "repository": "infinitelee/ammo-debug-drawer",
   "keywords": [
     "ammo",
     "ammo.js",
