@@ -1,5 +1,25 @@
 /* global Ammo,THREE */
 
+THREE.AmmoDebugConstants = {
+  NoDebug: 0,
+  DrawWireframe: 1,
+  DrawAabb: 2,
+  DrawFeaturesText: 4,
+  DrawContactPoints: 8,
+  NoDeactivation: 16,
+  NoHelpText: 32,
+  DrawText: 64,
+  ProfileTimings: 128,
+  EnableSatComparison: 256,
+  DisableBulletLCP: 512,
+  EnableCCD: 1024,
+  DrawConstraints: 1 << 11,
+  DrawConstraintLimits: 1 << 12,
+  FastWireframe: 1 << 13,
+  DrawNormals: 1 << 14,
+  MAX_DEBUG_DRAW_MODE: 0xffffffff
+};
+
 /**
  * An implementation of the btIDebugDraw interface in Ammo.js, for debug rendering of Ammo shapes
  * @class AmmoDebugDrawer
@@ -12,7 +32,7 @@ THREE.AmmoDebugDrawer = function(scene, world, options) {
   this.world = world;
   options = options || {};
 
-  this.debugDrawMode = options.debugDrawMode || 1;
+  this.debugDrawMode = options.debugDrawMode || THREE.AmmoDebugConstants.DrawWireframe;
   var drawOnTop = options.drawOnTop || false;
   var maxBufferSize = options.maxBufferSize || 1000000;
 
@@ -84,17 +104,26 @@ THREE.AmmoDebugDrawer.prototype.drawLine = function(from, to, color) {
   var colorVector = Ammo.wrapPointer(color, Ammo.btVector3);
 
   var fromVector = Ammo.wrapPointer(from, Ammo.btVector3);
-  this.geometry.attributes.position.setXYZ(this.index, fromVector.x(), fromVector.y(), fromVector.z());
-  this.geometry.attributes.color.setXYZ(this.index++, colorVector.x(), colorVector.y(), colorVector.z());
+  this._addPoint(fromVector, colorVector);
 
   var toVector = Ammo.wrapPointer(to, Ammo.btVector3);
-  this.geometry.attributes.position.setXYZ(this.index, toVector.x(), toVector.y(), toVector.z());
+  this._addPoint(toVector, colorVector);
+};
+
+THREE.AmmoDebugDrawer.prototype._addPoint = function(vector3, colorVector) {
+  this.geometry.attributes.position.setXYZ(this.index, vector3.x(), vector3.y(), vector3.z());
   this.geometry.attributes.color.setXYZ(this.index++, colorVector.x(), colorVector.y(), colorVector.z());
 };
 
 THREE.AmmoDebugDrawer.prototype.drawContactPoint = function(pointOnB, normalOnB, distance, lifeTime, color) {
-  //TODO
-  console.warn("TODO: drawContactPoint");
+  //TODO: figure out how to make lifeTime work
+  var colorVector = Ammo.wrapPointer(color, Ammo.btVector3);
+  var point = Ammo.wrapPointer(pointOnB, Ammo.btVector3);
+  var normal = Ammo.wrapPointer(normalOnB, Ammo.btVector3);
+  normal.op_mul(distance);
+
+  this._addPoint(point, colorVector);
+  this._addPoint(point.op_add(normal), colorVector);
 };
 
 THREE.AmmoDebugDrawer.prototype.reportErrorWarning = function(warningString) {
