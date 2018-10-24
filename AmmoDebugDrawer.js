@@ -13,10 +13,11 @@ THREE.AmmoDebugConstants = {
   EnableSatComparison: 256,
   DisableBulletLCP: 512,
   EnableCCD: 1024,
-  DrawConstraints: 1 << 11,
-  DrawConstraintLimits: 1 << 12,
-  FastWireframe: 1 << 13,
-  DrawNormals: 1 << 14,
+  DrawConstraints: 1 << 11, //2048
+  DrawConstraintLimits: 1 << 12, //4096
+  FastWireframe: 1 << 13, //8192
+  DrawNormals: 1 << 14, //16384
+  DrawOnTop: 1 << 15, //32768
   MAX_DEBUG_DRAW_MODE: 0xffffffff
 };
 
@@ -33,7 +34,7 @@ THREE.AmmoDebugDrawer = function(scene, world, options) {
   options = options || {};
 
   this.debugDrawMode = options.debugDrawMode || THREE.AmmoDebugConstants.DrawWireframe;
-  var drawOnTop = options.drawOnTop || false;
+  var drawOnTop = this.debugDrawMode & THREE.AmmoDebugConstants.DrawOnTop || false;
   var maxBufferSize = options.maxBufferSize || 1000000;
 
   this.geometry = new THREE.BufferGeometry();
