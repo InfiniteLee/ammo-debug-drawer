@@ -53,6 +53,7 @@ THREE.AmmoDebugDrawer = function(scene, world, options) {
 
   this.mesh = new THREE.LineSegments(this.geometry, material);
   if (drawOnTop) this.mesh.renderOrder = 999;
+  this.mesh.frustumCulled = false;
 
   this.enabled = false;
 
