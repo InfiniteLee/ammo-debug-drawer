@@ -103,29 +103,42 @@ THREE.AmmoDebugDrawer.prototype.update = function() {
 };
 
 THREE.AmmoDebugDrawer.prototype.drawLine = function(from, to, color) {
-  var colorVector = Ammo.wrapPointer(color, Ammo.btVector3);
+  const heap = Ammo.HEAPF32;
+  const r = heap[(color + 0) / 4];
+  const g = heap[(color + 4) / 4];
+  const b = heap[(color + 8) / 4];
 
-  var fromVector = Ammo.wrapPointer(from, Ammo.btVector3);
-  this._addPoint(fromVector, colorVector);
+  const fromX = heap[(from + 0) / 4];
+  const fromY = heap[(from + 4) / 4];
+  const fromZ = heap[(from + 8) / 4];
+  this.geometry.attributes.position.setXYZ(this.index, fromX, fromY, fromZ);
+  this.geometry.attributes.color.setXYZ(this.index++, r, g, b);
 
-  var toVector = Ammo.wrapPointer(to, Ammo.btVector3);
-  this._addPoint(toVector, colorVector);
+  const toX = heap[(to + 0) / 4];
+  const toY = heap[(to + 4) / 4];
+  const toZ = heap[(to + 8) / 4];
+  this.geometry.attributes.position.setXYZ(this.index, toX, toY, toZ);
+  this.geometry.attributes.color.setXYZ(this.index++, r, g, b);
 };
 
-THREE.AmmoDebugDrawer.prototype._addPoint = function(vector3, colorVector) {
-  this.geometry.attributes.position.setXYZ(this.index, vector3.x(), vector3.y(), vector3.z());
-  this.geometry.attributes.color.setXYZ(this.index++, colorVector.x(), colorVector.y(), colorVector.z());
-};
-
+//TODO: figure out how to make lifeTime work
 THREE.AmmoDebugDrawer.prototype.drawContactPoint = function(pointOnB, normalOnB, distance, lifeTime, color) {
-  //TODO: figure out how to make lifeTime work
-  var colorVector = Ammo.wrapPointer(color, Ammo.btVector3);
-  var point = Ammo.wrapPointer(pointOnB, Ammo.btVector3);
-  var normal = Ammo.wrapPointer(normalOnB, Ammo.btVector3);
-  normal.op_mul(distance);
+  const heap = Ammo.HEAPF32;
+  const r = heap[(color + 0) / 4];
+  const g = heap[(color + 4) / 4];
+  const b = heap[(color + 8) / 4];
 
-  this._addPoint(point, colorVector);
-  this._addPoint(point.op_add(normal), colorVector);
+  const x = heap[(pointOnB + 0) / 4];
+  const y = heap[(pointOnB + 4) / 4];
+  const z = heap[(pointOnB + 8) / 4];
+  this.geometry.attributes.position.setXYZ(this.index, x, y, z);
+  this.geometry.attributes.color.setXYZ(this.index++, r, g, b);
+
+  const dx = heap[(normalOnB + 0) / 4] * distance;
+  const dy = heap[(normalOnB + 4) / 4] * distance;
+  const dz = heap[(normalOnB + 8) / 4] * distance;
+  this.geometry.attributes.position.setXYZ(this.index, x + dx, y + dy, z + dz);
+  this.geometry.attributes.color.setXYZ(this.index++, r, g, b);
 };
 
 THREE.AmmoDebugDrawer.prototype.reportErrorWarning = function(warningString) {
