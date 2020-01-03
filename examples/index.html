@@ -37,9 +37,10 @@
     <script src="./js/three/GLTFLoader.js"></script>
     <script src="./js/three/OrbitControls.js"></script>
     <script src="./js/three/stats.min.js"></script>
-    <script src="../AmmoDebugDrawer.js"></script>
 
-    <script>
+    <script type="module">
+
+    import { AmmoDebugDrawer, AmmoDebugConstants, DefaultBufferSize } from "../AmmoDebugDrawer.js";
 
     Ammo().then(function(Ammo) {
       // - Global variables -
@@ -51,7 +52,7 @@
       var clock = new THREE.Clock();
 
       // Physics variables
-      var gravityConstant = -0.1;
+      var gravityConstant = -1;
       var collisionConfiguration;
       var dispatcher;
       var broadphase;
@@ -60,6 +61,10 @@
       var rigidBodies = [];
       var margin = 0.05;
       var transformAux1 = new Ammo.btTransform();
+
+      // Debug variables
+      var debugGeometry;
+      var debugDrawer;
 
       var time = 0;
 
@@ -133,12 +138,21 @@
       }
 
       function initDebug() {
-        this.debugDrawer = new THREE.AmmoDebugDrawer(scene, physicsWorld);
-        this.debugDrawer.enable();
+        var debugVertices = new Float32Array(DefaultBufferSize);
+        var debugColors = new Float32Array(DefaultBufferSize);
+        debugGeometry = new THREE.BufferGeometry();
+        debugGeometry.addAttribute("position", new THREE.BufferAttribute(debugVertices, 3).setDynamic(true));
+        debugGeometry.addAttribute("color", new THREE.BufferAttribute(debugColors, 3).setDynamic(true));
+        var debugMaterial = new THREE.LineBasicMaterial({ vertexColors: THREE.VertexColors });
+        var debugMesh = new THREE.LineSegments(debugGeometry, debugMaterial);
+        debugMesh.frustumCulled = false;
+        scene.add(debugMesh);
+        debugDrawer = new AmmoDebugDrawer(null, debugVertices, debugColors, physicsWorld);
+        debugDrawer.enable();
 
         setInterval(() => {
-          var mode = (this.debugDrawer.getDebugMode() + 1) % 3;
-          this.debugDrawer.setDebugMode(mode);
+          var mode = (debugDrawer.getDebugMode() + 1) % 3;
+          debugDrawer.setDebugMode(mode);
         }, 1000);
       }
 
@@ -231,7 +245,7 @@
           rigidBodies.push( threeObject );
 
           // Disable deactivation
-          body.setActivationState( 4 );
+          // body.setActivationState( 4 );
         }
 
         physicsWorld.addRigidBody( body );
@@ -266,7 +280,14 @@
 
         controls.update( deltaTime );
 
-        if (this.debugDrawer) this.debugDrawer.update();
+        if (debugDrawer) {
+          if (debugDrawer.index !== 0) {
+            debugGeometry.attributes.position.needsUpdate = true;
+            debugGeometry.attributes.color.needsUpdate = true;
+          }
+
+          debugGeometry.setDrawRange(0, debugDrawer.index);
+        }
 
         renderer.render( scene, camera );
 
