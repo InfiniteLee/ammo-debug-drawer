@@ -1,6 +1,6 @@
 {
   "name": "ammo-debug-drawer",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "An implementation of the btIDebugDraw interface in Ammo.js, for debug rendering of Ammo shapes.",
   "homepage": "https://github.com/infinitelee/ammo-debug-drawer",
   "main": "./AmmoDebugDrawer.js",
