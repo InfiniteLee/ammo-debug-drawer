@@ -1,6 +1,6 @@
 {
   "name": "ammo-debug-drawer",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "An implementation of the btIDebugDraw interface in Ammo.js, for debug rendering of Ammo shapes.",
   "homepage": "https://github.com/infinitelee/ammo-debug-drawer",
   "main": "./AmmoDebugDrawer.js",
@@ -14,8 +14,16 @@
     "ammo",
     "ammo.js",
     "physics",
-    "debug",
-    "three",
-    "three.js"
-  ]
+    "debug"
+  ],
+  "peerDependencies": {
+    "ammo.js": "*"
+  },
+  "devDependencies": {
+    "eslint": "^6.7.2",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "prettier": "^1.19.1",
+    "three": "^0.111.0"
+  }
 }
