@@ -137,7 +137,7 @@ AmmoDebugDrawer.prototype.drawContactPoint = function(pointOnB, normalOnB, dista
   setXYZ(this.colorsArray, this.index++, r, g, b);
 };
 
-THREE.AmmoDebugDrawer.prototype.reportErrorWarning = function(warningString) {
+AmmoDebugDrawer.prototype.reportErrorWarning = function(warningString) {
   if (Ammo.hasOwnProperty("UTF8ToString")) {
     console.warn(Ammo.UTF8ToString(warningString));
   } else if (!this.warnedOnce) {
