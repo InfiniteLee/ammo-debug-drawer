@@ -137,12 +137,12 @@ AmmoDebugDrawer.prototype.drawContactPoint = function(pointOnB, normalOnB, dista
   setXYZ(this.colorsArray, this.index++, r, g, b);
 };
 
-AmmoDebugDrawer.prototype.reportErrorWarning = function(warningString) {
-  if (Ammo.hasOwnProperty("Pointer_stringify")) {
-    console.warn(Ammo.Pointer_stringify(warningString));
+THREE.AmmoDebugDrawer.prototype.reportErrorWarning = function(warningString) {
+  if (Ammo.hasOwnProperty("UTF8ToString")) {
+    console.warn(Ammo.UTF8ToString(warningString));
   } else if (!this.warnedOnce) {
     this.warnedOnce = true;
-    console.warn("Cannot print warningString, please rebuild Ammo.js using 'debug' flag");
+    console.warn("Cannot print warningString, please export UTF8ToString from Ammo.js in make.py");
   }
 };
 
